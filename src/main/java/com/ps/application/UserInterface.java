@@ -105,25 +105,23 @@ public class UserInterface {
         } while (!validInput);
 
         inventory = vehicleDAOImpl.byPriceRange(min,max);
-
-        System.out.print("""
-                YEAR    MAKE          MODEL           COLOR       ODOMETER   PRICE    SOLD?
-                ----- ------------- --------------- ------------- -------- ---------- ------
-                """);
-
-        for (Vehicle vehicle : inventory) {
-            System.out.printf("%-6d %-13s %-15s %-13s %-8d $%-9.2f %-6s%n",
-                    vehicle.getYear(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(),
-                    vehicle.getOdometer(), vehicle.getPrice() , vehicle.isSold() ? "Yes" : "No");
-        }
+        printFormattedTable(inventory);
     }
+
     private static void processGetByMakeModelRequest() {
-        System.out.println("Enter make (required): ");
-        String make = inputScan.nextLine().toLowerCase();
-        System.out.println("Enter model (optional): "); // Optional, because someone may want to see all Toyota
-        String model = inputScan.nextLine().toLowerCase();
+        List<Vehicle> inventory;
 
+        System.out.println("Enter make and model separated by a space: ");
+        String inputMakeModel = inputScan.nextLine();
+
+        String[] makeModel = inputMakeModel.split(" ",2);
+        String make = String.format("%s%%", makeModel[0]);
+        String model = String.format("%s%%", makeModel[1]);
+
+        inventory = vehicleDAOImpl.byMakeModel(make, model);
+        printFormattedTable(inventory);
     }
+
     private static void processGetByYearRequest() {
         System.out.println("Enter starting year: ");
         int minYear = inputScan.nextInt();
@@ -131,14 +129,17 @@ public class UserInterface {
         int maxYear = inputScan.nextInt();
 
     }
+
     private static void processGetByColorRequest() {
         System.out.println("Enter a color: ");
         String color = inputScan.nextLine().toLowerCase();
 
     }
+
     private static void processGetByMileageRequest() {
 
     }
+
     private static void processGetByVehicleTypeRequest() {
 
     }
@@ -150,7 +151,22 @@ public class UserInterface {
     private static void processAddVehicleRequest() {
 
     }
+
     private static void processRemoveVehicleRequest() {
 
     }
+
+    private static void printFormattedTable(List<Vehicle> inventory) {
+        System.out.print("""
+                YEAR   MAKE          MODEL           COLOR        ODOMETER  PRICE     SOLD?
+                ----- ------------- --------------- ------------- -------- ---------- ------
+                """);
+
+        for (Vehicle vehicle : inventory) {
+            System.out.printf("%-6d %-13s %-15s %-13s %-8d $%-9.2f %-6s%n",
+                    vehicle.getYear(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(),
+                    vehicle.getOdometer(), vehicle.getPrice(), vehicle.isSold() ? "Yes" : "No");
+        }
+    } // Helper method for iterating through Lists and displaying search results in a consistent format
+
 }

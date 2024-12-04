@@ -47,6 +47,29 @@ public class VehicleDAOImpl implements VehicleDAOInt {
 
     @Override
     public List<Vehicle> byMakeModel(String make, String model) {
+        List<Vehicle> vehicles = new ArrayList<>();
+        String query = "SELECT * FROM vehicles WHERE make LIKE ? AND model LIKE ?;";
+
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(query);
+        ) {
+
+            preparedStatement.setString(1, make);
+            preparedStatement.setString(2, model);
+
+            try (
+                    ResultSet resultSet = preparedStatement.executeQuery();
+            ) {
+                while (resultSet.next()) {
+                    Vehicle vehicle = mapVehicle(resultSet);
+                    vehicles.add(vehicle);
+                }
+            }
+            return vehicles;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
