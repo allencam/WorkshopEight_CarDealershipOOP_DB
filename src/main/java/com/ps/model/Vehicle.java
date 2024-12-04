@@ -1,31 +1,37 @@
 package com.ps.model;
 
 public class Vehicle {
-    private int vin;
+    private String vin;
     private int year;
     private String make;
     private String model;
-    private String vehicleType; // Car, truck, SUV, etc.
+    private String type; // Car, truck, SUV, etc.
     private String color;
+    private boolean sold;
     private int odometer;
     private double price;
+    private int dealershipId;
 
-    public Vehicle(int vin, int year, String make, String model, String vehicleType, String color, int odometer, double price) {
+    public Vehicle() {}
+
+    public Vehicle(String vin, int year, String make, String model, String type, String color, boolean sold, int odometer, double price, int dealershipId) {
         this.vin = vin;
         this.year = year;
         this.make = make;
         this.model = model;
-        this.vehicleType = vehicleType;
+        this.type = type;
         this.color = color;
+        this.sold = sold;
         this.odometer = odometer;
         this.price = price;
+        this.dealershipId = dealershipId;
     }
 
-    public int getVin() {
+    public String getVin() {
         return vin;
     }
 
-    public void setVin(int vin) {
+    public void setVin(String vin) {
         this.vin = vin;
     }
 
@@ -53,12 +59,12 @@ public class Vehicle {
         this.model = model;
     }
 
-    public String getVehicleType() {
-        return vehicleType;
+    public String getType() {
+        return type;
     }
 
-    public void setVehicleType(String vehicleType) {
-        this.vehicleType = vehicleType;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getColor() {
@@ -85,6 +91,22 @@ public class Vehicle {
         this.price = price;
     }
 
+    public boolean isSold() {
+        return sold;
+    }
+
+    public void setSold(boolean sold) {
+        this.sold = sold;
+    }
+
+    public int getDealershipId() {
+        return dealershipId;
+    }
+
+    public void setDealershipId(int dealershipId) {
+        this.dealershipId = dealershipId;
+    }
+
     @Override
     public String toString() {
 
@@ -93,7 +115,7 @@ public class Vehicle {
                 year,
                 make,
                 model,
-                vehicleType,
+                type,
                 color,
                 odometer,
                 price

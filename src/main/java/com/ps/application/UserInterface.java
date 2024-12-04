@@ -1,24 +1,29 @@
 package com.ps.application;
 
+import com.ps.data.VehicleDAOImpl;
 import com.ps.model.*;
-import com.ps.filemanager.*;
+import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.util.List;
 import java.util.Scanner;
 
 public class UserInterface {
 
-    static Scanner commandScan = new Scanner(System.in);
-    static Scanner inputScan = new Scanner(System.in);
+    private static BasicDataSource basicDataSource = new BasicDataSource();
+    private static VehicleDAOImpl vehicleDAOImpl = new VehicleDAOImpl(basicDataSource);
+
+    private static Scanner commandScan = new Scanner(System.in);
+    private static Scanner inputScan = new Scanner(System.in);
     private static Dealership dealership; // Declaration, still need to initialize (name, address, phone)
 
-    private static void init(){ // private, since we don't want to access this method in any other class
-        // Loading the dealership from a file
-        dealership = DealershipFileManager.getDealership();
-
+    private static void init(){
     }
 
     public static void display(String username, String password) {
+        basicDataSource.setUrl("jdbc:mysql://localhost:3306/dealership_db");
+        basicDataSource.setUsername(username);
+        basicDataSource.setPassword(password);
+
         init();
         // Load the menu
         int mainMenuCommand;
@@ -77,19 +82,40 @@ public class UserInterface {
             }
         } while (mainMenuCommand != 0);
     }
-    private static void displayVehicles(List<Vehicle> vehicles) {
-        // TODO: Make a method to loop through the result set
-    }
 
     private static void processGetByPriceRequest() {
-        double min = 0;
-        double max = 0;
-        System.out.print("Enter minimum value (enter 0 for no minimum): ");
-        min = inputScan.nextDouble();
-        System.out.print("Enter maximum value (enter 0 for no maximum): ");
-        max = inputScan.nextDouble();
+        double min;
+        double max;
+        boolean validInput = false;
+        List<Vehicle> inventory;
 
-        displayVehicles(dealership.getVehiclesByPrice(min,max));
+        do {
+            System.out.print("Enter minimum and maximum values to search by (xxxx.xx - xxxx.xx): ");
+            String userInputMinMax = inputScan.nextLine();
+
+            String[] values = userInputMinMax.trim().split("-",2);
+            min = Double.parseDouble(values[0]);
+            max = Double.parseDouble(values[1]);
+
+            if (min < max) {
+                validInput = true;
+            } else {
+                System.out.println("Invalid entry, try again.");
+            }
+        } while (!validInput);
+
+        inventory = vehicleDAOImpl.byPriceRange(min,max);
+
+        System.out.print("""
+                YEAR    MAKE          MODEL           COLOR       ODOMETER   PRICE    SOLD?
+                ----- ------------- --------------- ------------- -------- ---------- ------
+                """);
+
+        for (Vehicle vehicle : inventory) {
+            System.out.printf("%-6d %-13s %-15s %-13s %-8d $%-9.2f %-6s%n",
+                    vehicle.getYear(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(),
+                    vehicle.getOdometer(), vehicle.getPrice() , vehicle.isSold() ? "Yes" : "No");
+        }
     }
     private static void processGetByMakeModelRequest() {
         System.out.println("Enter make (required): ");
@@ -97,7 +123,6 @@ public class UserInterface {
         System.out.println("Enter model (optional): "); // Optional, because someone may want to see all Toyota
         String model = inputScan.nextLine().toLowerCase();
 
-        displayVehicles(dealership.getVehiclesByMakeModel(make,model));
     }
     private static void processGetByYearRequest() {
         System.out.println("Enter starting year: ");
@@ -105,13 +130,11 @@ public class UserInterface {
         System.out.println("Enter ending year: ");
         int maxYear = inputScan.nextInt();
 
-        displayVehicles(dealership.getVehiclesByYear(minYear,maxYear));
     }
     private static void processGetByColorRequest() {
         System.out.println("Enter a color: ");
         String color = inputScan.nextLine().toLowerCase();
 
-        displayVehicles(dealership.getVehiclesByColor(color));
     }
     private static void processGetByMileageRequest() {
 
@@ -119,9 +142,11 @@ public class UserInterface {
     private static void processGetByVehicleTypeRequest() {
 
     }
+
     public static void processGetAllVehiclesRequest() {
-        displayVehicles(dealership.getAllVehicles());
+
     }
+
     private static void processAddVehicleRequest() {
 
     }
