@@ -18,7 +18,7 @@ public class UserInterface {
 
     }
 
-    public static void display() {
+    public static void display(String username, String password) {
         init();
         // Load the menu
         int mainMenuCommand;
@@ -78,9 +78,7 @@ public class UserInterface {
         } while (mainMenuCommand != 0);
     }
     private static void displayVehicles(List<Vehicle> vehicles) {
-        for(Vehicle vehicle : vehicles) {
-            System.out.println(vehicle);
-        }
+        // TODO: Make a method to loop through the result set
     }
 
     private static void processGetByPriceRequest() {
